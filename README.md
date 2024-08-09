@@ -1,5 +1,9 @@
 # Getting Started with Create React App
 
+#### Для запуска проекта необходимо установить зависимости из npm(`npm install`), после чего выполнить команду `npm run start`. Далее проект будет доступен по адресу http://localhost:3000
+
+#### Либо воспользуйтесь файлом './start.sh', перед этим сделав его исполняемым в системе.
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
