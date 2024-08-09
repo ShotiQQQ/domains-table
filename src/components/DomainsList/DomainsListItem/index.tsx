@@ -1,7 +1,7 @@
 import styles from './DomainsListItem.module.scss';
 import { FC } from 'react';
 import { IDomainItem } from 'types';
-import Button from '../../UI/Button';
+import Button from 'components/UI/Button';
 
 const DomainsListItem: FC<IDomainItem> = ({ domainName, isAvailable }) => {
   return (
