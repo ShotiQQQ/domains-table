@@ -1,0 +1,25 @@
+@import "normalize.css";
+
+body {
+  margin: 0;
+  padding: 0;
+  /*background-color: rgb(9, 15, 30);*/
+  font-family: Inter, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  monospace;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+input {
+  appearance: none;
+}
