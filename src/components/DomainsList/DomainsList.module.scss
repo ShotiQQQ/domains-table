@@ -11,6 +11,11 @@
   border: 2px solid black;
   border-radius: 12px;
 
+  &Search {
+    width: 100%;
+    margin-bottom: 24px;
+  }
+
   &Container {
     max-width: 800px;
     margin: 0 auto;
