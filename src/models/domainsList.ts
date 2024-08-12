@@ -22,15 +22,15 @@ export const domainsList: TDomainList = [
     isAvailable: true,
   },
   {
-    domainName: 'https://five.com',
+    domainName: 'https://six.com',
     isAvailable: true,
   },
   {
-    domainName: 'https://five.com',
+    domainName: 'https://seven.com',
     isAvailable: true,
   },
   {
-    domainName: 'https://five.com',
+    domainName: 'https://eight.com',
     isAvailable: true,
   },
 ];
