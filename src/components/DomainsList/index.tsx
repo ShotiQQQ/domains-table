@@ -1,9 +1,11 @@
+import { useEffect, useState } from 'react';
+
 import styles from './DomainsList.module.scss';
+
 import DomainsListHeader from './DomainsListHeader';
 import DomainsListItem from './DomainsListItem';
-import { ChangeEvent, useEffect, useState } from 'react';
-import Input from '../UI/Input';
-import Button from '../UI/Button';
+import DomainsListSearch from './DomainsListSearch';
+
 import {
   DomainsListViewFragment,
   useAllDomainsQuery,
@@ -12,18 +14,13 @@ import {
 
 const DomainsList = () => {
   const [domainsList, setDomainsList] = useState<DomainsListViewFragment[]>([]);
-  const [searchInputValue, setSearchInputValue] = useState('');
 
   const { data: allDomains, loading: allDomainsLoading } = useAllDomainsQuery();
   const [getFilteredDomains] = useGetDomainsByStringLazyQuery();
 
-  const setCurrentSearchInputValue = (event: ChangeEvent<HTMLInputElement>) => {
-    setSearchInputValue(event.target.value);
-  };
-
-  const handleSearchDomains = () => {
+  const searchDomains = (value: string) => {
     getFilteredDomains({
-      variables: { includes: searchInputValue },
+      variables: { includes: value },
     }).then(({ data }) => {
       if (data?.allLocalDevsList instanceof Array) {
         setDomainsList([...data?.allLocalDevsList]);
@@ -42,15 +39,7 @@ const DomainsList = () => {
   return (
     <div className={styles.listContainer}>
       <div className={styles.listSearch}>
-        <Input
-          value={searchInputValue}
-          placeholder="Поиск"
-          onChange={setCurrentSearchInputValue}
-        />
-
-        <Button style={{ marginLeft: '12px' }} onClick={handleSearchDomains}>
-          Поиск
-        </Button>
+        <DomainsListSearch onClick={searchDomains} />
       </div>
 
       <DomainsListHeader />
