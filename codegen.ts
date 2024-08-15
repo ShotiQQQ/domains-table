@@ -4,7 +4,7 @@ const config: CodegenConfig = {
   schema: 'http://localhost:4000/graphql',
   documents: './src/**/*.graphql',
   generates: {
-    'src/types/types.ts': {
+    'src/types.ts': {
       plugins: ['typescript'],
     },
     'src/': {
@@ -24,5 +24,4 @@ const config: CodegenConfig = {
     },
   },
 };
-
 export default config;

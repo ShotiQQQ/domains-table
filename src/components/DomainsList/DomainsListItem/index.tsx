@@ -1,7 +1,7 @@
 import styles from './DomainsListItem.module.scss';
 import { FC } from 'react';
 import Button from 'components/UI/Button';
-import { LocalDev } from '../../../types/types';
+import { LocalDev } from '../../../types';
 
 const DomainsListItem: FC<LocalDev> = ({ id, domain, available }) => {
   return (

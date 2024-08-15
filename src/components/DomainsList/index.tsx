@@ -5,13 +5,13 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import Input from '../UI/Input';
 import Button from '../UI/Button';
 import {
+  DomainsListViewFragment,
   useAllDomainsQuery,
   useGetDomainsByStringLazyQuery,
-} from '../../query/domains.generated';
-import { LocalDev } from '../../types/types';
+} from './domains.generated';
 
 const DomainsList = () => {
-  const [domainsList, setDomainsList] = useState<LocalDev[]>([]);
+  const [domainsList, setDomainsList] = useState<DomainsListViewFragment[]>([]);
   const [searchInputValue, setSearchInputValue] = useState('');
 
   const { data: allDomains, loading: allDomainsLoading } = useAllDomainsQuery();

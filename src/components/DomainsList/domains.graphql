@@ -1,15 +1,19 @@
 query allDomains {
     allLocalDevsList {
-        available
-        domain
-        id
+        ... DomainsListView
     }
 }
 
 query getDomainsByString($includes: String = "") {
     allLocalDevsList(filter: {domain: {includes: $includes}}) {
-        domain
-        id
-        available
+        ... DomainsListView
     }
+}
+
+fragment DomainsListView on LocalDev {
+    __typename
+
+    id
+    domain
+    available
 }
