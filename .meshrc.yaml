@@ -1,0 +1,9 @@
+sources:
+  - name: Domains
+    handler:
+      postgraphile:
+        connectionString: postgres://admin:admin@localhost:5432/postgres
+        schemaName:
+          - public
+        appendPlugins:
+          - postgraphile-plugin-connection-filter

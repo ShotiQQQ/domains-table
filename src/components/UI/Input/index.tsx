@@ -7,9 +7,7 @@ interface IInputProps {
 }
 
 const Input: FC<IInputProps> = ({ value, onChange, placeholder }) => {
-  return (
-    <input onChange={onChange} value={value} placeholder={placeholder} />
-  );
+  return <input onChange={onChange} value={value} placeholder={placeholder} />;
 };
 
 export default Input;

@@ -1,0 +1,15 @@
+query allDomains {
+    allLocalDevsList {
+        available
+        domain
+        id
+    }
+}
+
+query getDomainsByString($includes: String = "") {
+    allLocalDevsList(filter: {domain: {includes: $includes}}) {
+        domain
+        id
+        available
+    }
+}

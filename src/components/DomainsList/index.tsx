@@ -1,54 +1,82 @@
 import styles from './DomainsList.module.scss';
 import DomainsListHeader from './DomainsListHeader';
 import DomainsListItem from './DomainsListItem';
-import { domainsList } from 'models/domainsList';
-import { ChangeEvent, useState } from 'react';
-import { TDomainList } from 'types';
+import { ChangeEvent, useEffect, useState } from 'react';
 import Input from '../UI/Input';
+import Button from '../UI/Button';
+import {
+  useAllDomainsQuery,
+  useGetDomainsByStringLazyQuery,
+} from '../../query/domains.generated';
+import { LocalDev } from '../../types/types';
 
 const DomainsList = () => {
-  const [currentDomainsList, setCurrentDomainsList] =
-    useState<TDomainList>(domainsList);
-  const [filteredDomainsList, setFilteredDomainsList] = useState<TDomainList>([...currentDomainsList]);
+  const [domainsList, setDomainsList] = useState<LocalDev[]>([]);
   const [searchInputValue, setSearchInputValue] = useState('');
+
+  const { data: allDomains, loading: allDomainsLoading } = useAllDomainsQuery();
+  const [getFilteredDomains] = useGetDomainsByStringLazyQuery();
 
   const setCurrentSearchInputValue = (event: ChangeEvent<HTMLInputElement>) => {
     setSearchInputValue(event.target.value);
+  };
 
-    setTimeout(() => {
-      searchItems(event.target.value);
-    }, 300);
-  }
+  const handleSearchDomains = () => {
+    getFilteredDomains({
+      variables: { includes: searchInputValue },
+    }).then(({ data }) => {
+      if (data?.allLocalDevsList instanceof Array) {
+        setDomainsList([...data?.allLocalDevsList]);
+      }
+    });
+  };
 
-  const searchItems = (value: string) => {
-    const includedItems = currentDomainsList.filter((item) => item.domainName.includes(value));
-
-    if (includedItems.length && searchInputValue) {
-      setFilteredDomainsList([...includedItems])
-    } else {
-      setFilteredDomainsList([...currentDomainsList])
+  useEffect(() => {
+    if (!allDomainsLoading) {
+      if (allDomains?.allLocalDevsList instanceof Array && !allDomainsLoading) {
+        setDomainsList([...allDomains?.allLocalDevsList]);
+      }
     }
-  }
+  }, [allDomains, allDomainsLoading]);
 
   return (
     <div className={styles.listContainer}>
       <div className={styles.listSearch}>
-        <Input value={searchInputValue} placeholder='Поиск' onChange={setCurrentSearchInputValue} />
+        <Input
+          value={searchInputValue}
+          placeholder="Поиск"
+          onChange={setCurrentSearchInputValue}
+        />
+
+        <Button style={{ marginLeft: '12px' }} onClick={handleSearchDomains}>
+          Поиск
+        </Button>
       </div>
 
       <DomainsListHeader />
 
-      <ul className={styles.list}>
-        {filteredDomainsList.map(({ domainName, isAvailable }) => {
-          return (
-            <DomainsListItem
-              domainName={domainName}
-              isAvailable={isAvailable}
-              key={domainName}
-            />
-          );
-        })}
-      </ul>
+      <div className={styles.listContent}>
+        {!domainsList.length && !allDomainsLoading && (
+          <p className="">Список пуст...</p>
+        )}
+
+        {allDomainsLoading && <div className={styles.listLoader}></div>}
+
+        {!allDomainsLoading && (
+          <ul className={styles.list}>
+            {domainsList.map(({ domain, available, id }) => {
+              return (
+                <DomainsListItem
+                  id={id}
+                  domain={domain}
+                  available={available}
+                  key={id}
+                />
+              );
+            })}
+          </ul>
+        )}
+      </div>
     </div>
   );
 };

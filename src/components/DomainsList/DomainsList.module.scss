@@ -1,15 +1,18 @@
 .list {
-  padding: 8px;
+  padding: 0;
   margin: 0;
   list-style: none;
-
   display: flex;
   flex-direction: column;
   gap: 12px;
-  min-height: 250px;
 
-  border: 2px solid black;
-  border-radius: 12px;
+  &Content {
+    position: relative;
+    padding: 8px;
+    border: 2px solid black;
+    border-radius: 12px;
+    min-height: 250px;
+  }
 
   &Search {
     width: 100%;
@@ -19,5 +22,31 @@
   &Container {
     max-width: 800px;
     margin: 0 auto;
+  }
+
+  &Loader {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    transform-origin: left top;
+    width: 71px;
+    height: 32px;
+    background-size: 100% 100%;
+    background-image: url('~/public/images/logo.svg');
+    animation-name: spiner;
+    animation-iteration-count: infinite;
+    animation-duration: 1.5s;
+    animation-timing-function: linear;
+  }
+}
+
+@keyframes spiner {
+  50% {
+    scale: 1.2;
+  }
+
+  to {
+    scale: 1;
   }
 }
