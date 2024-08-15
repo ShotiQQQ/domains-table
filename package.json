@@ -41,7 +41,8 @@
     "eject": "react-scripts eject",
     "mesh:build": "mesh build",
     "mesh:serve": "mesh dev",
-    "generate": "graphql-codegen"
+    "generate": "graphql-codegen",
+    "prettier-fix": "prettier . --write"
   },
   "eslintConfig": {
     "extends": [

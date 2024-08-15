@@ -1,18 +1,31 @@
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
-export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
-export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+export type Exact<T extends { [key: string]: unknown }> = {
+  [K in keyof T]: T[K];
+};
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
+  [SubKey in K]?: Maybe<T[SubKey]>;
+};
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
+  [SubKey in K]: Maybe<T[SubKey]>;
+};
+export type MakeEmpty<
+  T extends { [key: string]: unknown },
+  K extends keyof T,
+> = { [_ in K]?: never };
+export type Incremental<T> =
+  | T
+  | {
+      [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never;
+    };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: { input: string; output: string; }
-  String: { input: string; output: string; }
-  Boolean: { input: boolean; output: boolean; }
-  Int: { input: number; output: number; }
-  Float: { input: number; output: number; }
-  Cursor: { input: any; output: any; }
+  ID: { input: string; output: string };
+  String: { input: string; output: string };
+  Boolean: { input: boolean; output: boolean };
+  Int: { input: number; output: number };
+  Float: { input: number; output: number };
+  Cursor: { input: any; output: any };
 };
 
 /** A filter to be used against Boolean fields. All fields are combined with a logical ‘and.’ */
@@ -67,7 +80,6 @@ export type CreateLocalDevPayload = {
   /** Our root query field type. Allows us to run any query from our mutation payload. */
   query?: Maybe<Query>;
 };
-
 
 /** The output of our create `LocalDev` mutation. */
 export type CreateLocalDevPayloadLocalDevEdgeArgs = {
@@ -173,7 +185,7 @@ export enum LocalDevsOrderBy {
   DomainDesc = 'DOMAIN_DESC',
   IdAsc = 'ID_ASC',
   IdDesc = 'ID_DESC',
-  Natural = 'NATURAL'
+  Natural = 'NATURAL',
 }
 
 /** The root mutation type which contains root level fields which mutate data. */
@@ -182,7 +194,6 @@ export type Mutation = {
   /** Creates a single `LocalDev`. */
   createLocalDev?: Maybe<CreateLocalDevPayload>;
 };
-
 
 /** The root mutation type which contains root level fields which mutate data. */
 export type MutationCreateLocalDevArgs = {
@@ -226,7 +237,6 @@ export type Query = Node & {
   query: Query;
 };
 
-
 /** The root query type which gives access points into the data universe. */
 export type QueryAllLocalDevsArgs = {
   after?: InputMaybe<Scalars['Cursor']['input']>;
@@ -239,7 +249,6 @@ export type QueryAllLocalDevsArgs = {
   orderBy?: InputMaybe<Array<LocalDevsOrderBy>>;
 };
 
-
 /** The root query type which gives access points into the data universe. */
 export type QueryAllLocalDevsListArgs = {
   condition?: InputMaybe<LocalDevCondition>;
@@ -248,7 +257,6 @@ export type QueryAllLocalDevsListArgs = {
   offset?: InputMaybe<Scalars['Int']['input']>;
   orderBy?: InputMaybe<Array<LocalDevsOrderBy>>;
 };
-
 
 /** The root query type which gives access points into the data universe. */
 export type QueryNodeArgs = {
@@ -372,7 +380,6 @@ export type Subscription = {
   query: Query;
 };
 
-
 /**
  * The root subscription type: contains events and live queries you can subscribe to with the `subscription` operation.
  *
@@ -406,7 +413,6 @@ export type SubscriptionAllLocalDevsArgs = {
   orderBy?: InputMaybe<Array<LocalDevsOrderBy>>;
 };
 
-
 /**
  * The root subscription type: contains events and live queries you can subscribe to with the `subscription` operation.
  *
@@ -436,7 +442,6 @@ export type SubscriptionAllLocalDevsListArgs = {
   offset?: InputMaybe<Scalars['Int']['input']>;
   orderBy?: InputMaybe<Array<LocalDevsOrderBy>>;
 };
-
 
 /**
  * The root subscription type: contains events and live queries you can subscribe to with the `subscription` operation.
