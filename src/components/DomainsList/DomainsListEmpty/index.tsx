@@ -2,7 +2,7 @@ import { TableCell, TableRow } from '@mui/material';
 
 const DomainsListEmpty = () => {
   return (
-    <TableRow>
+    <TableRow sx={{ verticalAlign: 'text-top' }}>
       <TableCell>
         <p style={{ margin: 0 }}>Список пуст...</p>
       </TableCell>
