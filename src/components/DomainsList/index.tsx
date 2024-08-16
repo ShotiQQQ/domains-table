@@ -3,6 +3,9 @@ import { useEffect, useState } from 'react';
 import styles from './DomainsList.module.scss';
 
 import DomainsListSearch from './DomainsListSearch';
+import DomainsListItem from './DomainsListItem';
+import DomainsListHeader from './DomainsListHeader';
+import DomainsListEmpty from './DomainsListEmpty';
 import {
   Paper,
   Table,
@@ -16,9 +19,6 @@ import {
   useAllDomainsQuery,
   useGetDomainsByStringLazyQuery,
 } from './domains.generated';
-import DomainsListItem from './DomainsListItem';
-import DomainsListHeader from './DomainsListHeader';
-import DomainsListEmpty from './DomainsListEmpty';
 
 const DomainsList = () => {
   const [domainsList, setDomainsList] = useState<DomainsListViewFragment[]>([]);
