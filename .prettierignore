@@ -1,0 +1,6 @@
+.mesh/
+build/
+node_modules/
+*.graphql
+*.yaml
+*.yml

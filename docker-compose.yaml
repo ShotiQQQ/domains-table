@@ -1,0 +1,11 @@
+version: "3.9"  # Adjust version if needed
+
+services:
+  postgres:
+    image: postgres:16.3
+    environment:
+      POSTGRES_PASSWORD: admin  # Replace with your password
+      POSTGRES_USER: admin  # Replace with your username
+      POSTGRES_DB: local_dev  # Replace with your database name
+    ports:
+      - "5432:5432"  # Map container port 5432 to host port 5432

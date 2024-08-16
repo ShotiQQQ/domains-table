@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
 
-import DomainsList from "./components/DomainsList";
+import DomainsList from './components/DomainsList';
 
 function App() {
   return (

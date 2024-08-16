@@ -1,19 +1,16 @@
-import styles from "./DomainsListHeader.module.scss";
+import { TableCell, TableHead, TableRow } from '@mui/material';
 
 const DomainsListHeader = () => {
-    return (
-        <div className={styles.header}>
-            <div className={styles.headerDomain}>
-                <p className={styles.headerText}>Домен</p>
-            </div>
-            <div className={styles.headerStatus}>
-                <p className={styles.headerText}>Статус</p>
-            </div>
-            <div className={styles.headerButtons}>
-                Управление
-            </div>
-        </div>
-    );
+  return (
+    <TableHead>
+      <TableRow>
+        <TableCell>id</TableCell>
+        <TableCell>Домен</TableCell>
+        <TableCell align="right">Статус</TableCell>
+        <TableCell align="right">Управление</TableCell>
+      </TableRow>
+    </TableHead>
+  );
 };
 
 export default DomainsListHeader;

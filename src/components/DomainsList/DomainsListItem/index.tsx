@@ -1,26 +1,34 @@
-import styles from './DomainsListItem.module.scss';
 import { FC } from 'react';
-import { IDomainItem } from 'types';
-import Button from 'components/UI/Button';
 
-const DomainsListItem: FC<IDomainItem> = ({ domainName, isAvailable }) => {
+import styles from './DomainsListItem.module.scss';
+
+import MyButton from 'components/UI/MyButton';
+import { TableCell } from '@mui/material';
+
+import { LocalDev } from '../../../types';
+
+const DomainsListItem: FC<LocalDev> = ({ id, domain, available }) => {
   return (
-    <li className={styles.item}>
-      <div className={styles.itemDomain}>
-        <p className={styles.itemText}>{domainName}</p>
-      </div>
-      <div className={styles.itemStatus}>
+    <>
+      <TableCell>{id}</TableCell>
+      <TableCell>
+        <b>{domain}</b>
+      </TableCell>
+      <TableCell align="right">
         <p
           className={styles.itemText}
-          style={{ color: isAvailable ? 'lightgreen' : 'red' }}
+          style={{
+            color: available ? '#2e7d32' : '#d32f2f',
+            margin: 0,
+          }}
         >
-          {isAvailable ? 'Доступен' : 'Недоступен'}
+          {available ? 'Доступен' : 'Недоступен'}
         </p>
-      </div>
-      <div className={styles.itemButtons}>
-        <Button text="Обновить статус" />
-      </div>
-    </li>
+      </TableCell>
+      <TableCell align="right">
+        <MyButton size="small">Обновить статус</MyButton>
+      </TableCell>
+    </>
   );
 };
 
