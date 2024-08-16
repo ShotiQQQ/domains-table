@@ -2,15 +2,23 @@ import { useEffect, useState } from 'react';
 
 import styles from './DomainsList.module.scss';
 
-import DomainsListHeader from './DomainsListHeader';
-import DomainsListItem from './DomainsListItem';
 import DomainsListSearch from './DomainsListSearch';
+import {
+  Paper,
+  Table,
+  TableBody,
+  TableContainer,
+  TableRow,
+} from '@mui/material';
 
 import {
   DomainsListViewFragment,
   useAllDomainsQuery,
   useGetDomainsByStringLazyQuery,
 } from './domains.generated';
+import DomainsListItem from './DomainsListItem';
+import DomainsListHeader from './DomainsListHeader';
+import DomainsListEmpty from './DomainsListEmpty';
 
 const DomainsList = () => {
   const [domainsList, setDomainsList] = useState<DomainsListViewFragment[]>([]);
@@ -39,32 +47,36 @@ const DomainsList = () => {
   return (
     <div className={styles.listContainer}>
       <div className={styles.listSearch}>
-        <DomainsListSearch onClick={searchDomains} />
+        <DomainsListSearch searchDomains={searchDomains} />
       </div>
 
-      <DomainsListHeader />
-
       <div className={styles.listContent}>
-        {!domainsList.length && !allDomainsLoading && (
-          <p className="">Список пуст...</p>
-        )}
-
         {allDomainsLoading && <div className={styles.listLoader}></div>}
 
-        {!allDomainsLoading && (
-          <ul className={styles.list}>
-            {domainsList.map(({ domain, available, id }) => {
-              return (
-                <DomainsListItem
-                  id={id}
-                  domain={domain}
-                  available={available}
-                  key={id}
-                />
-              );
-            })}
-          </ul>
-        )}
+        <TableContainer component={Paper}>
+          <Table sx={{ minWidth: 550, minHeight: 200 }}>
+            <DomainsListHeader />
+
+            <TableBody>
+              {!domainsList.length && !allDomainsLoading && (
+                <DomainsListEmpty />
+              )}
+
+              {!allDomainsLoading &&
+                domainsList.map(({ domain, available, id }) => {
+                  return (
+                    <TableRow key={id}>
+                      <DomainsListItem
+                        available={available}
+                        domain={domain}
+                        id={id}
+                      />
+                    </TableRow>
+                  );
+                })}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </div>
     </div>
   );
