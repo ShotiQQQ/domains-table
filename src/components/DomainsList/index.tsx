@@ -65,7 +65,7 @@ const DomainsList = () => {
               {!allDomainsLoading &&
                 domainsList.map(({ domain, available, id }) => {
                   return (
-                    <TableRow key={id}>
+                    <TableRow key={id} sx={{ verticalAlign: 'text-top' }}>
                       <DomainsListItem
                         available={available}
                         domain={domain}
