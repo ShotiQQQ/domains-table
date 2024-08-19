@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 
 import styles from './DomainsList.module.scss';
 
@@ -7,6 +7,7 @@ import DomainsListItem from './DomainsListItem';
 import DomainsListHeader from './DomainsListHeader';
 import DomainsListEmpty from './DomainsListEmpty';
 import {
+  Pagination,
   Paper,
   Table,
   TableBody,
@@ -16,33 +17,66 @@ import {
 
 import {
   DomainsListViewFragment,
-  useAllDomainsQuery,
   useGetDomainsByStringLazyQuery,
+  useGetPaginatedListLazyQuery,
+  useGetTotalCountLazyQuery,
 } from './domains.generated';
+
+const domainsPerPage = 5;
 
 const DomainsList = () => {
   const [domainsList, setDomainsList] = useState<DomainsListViewFragment[]>([]);
+  const [countPages, setCountPages] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
-  const { data: allDomains, loading: allDomainsLoading } = useAllDomainsQuery();
+  const [getPaginatedList] = useGetPaginatedListLazyQuery();
   const [getFilteredDomains] = useGetDomainsByStringLazyQuery();
+  const [getTotalCount] = useGetTotalCountLazyQuery();
 
   const searchDomains = (value: string) => {
-    getFilteredDomains({
-      variables: { includes: value },
+    if (value) {
+      getFilteredDomains({
+        variables: { includes: value, count: domainsPerPage },
+      }).then(({ data }) => {
+        if (data?.allLocalDevs?.nodes instanceof Array) {
+          setDomainsList([...data?.allLocalDevs?.nodes]);
+        }
+      });
+    } else {
+      setDomainsListPaginated();
+    }
+  };
+
+  const setDomainsListPaginated = (offset?: number) => {
+    getPaginatedList({
+      variables: {
+        offset,
+        first: domainsPerPage,
+      },
     }).then(({ data }) => {
-      if (data?.allLocalDevsList instanceof Array) {
-        setDomainsList([...data?.allLocalDevsList]);
-      }
+      const list = data?.allLocalDevs?.nodes;
+
+      list && setDomainsList([...list]);
     });
   };
 
+  const handleClickPagination = (
+    event: ChangeEvent<unknown>,
+    value: number,
+  ) => {
+    setCurrentPage(value);
+    setDomainsListPaginated(value * domainsPerPage - domainsPerPage);
+  };
+
   useEffect(() => {
-    if (!allDomainsLoading) {
-      if (allDomains?.allLocalDevsList instanceof Array && !allDomainsLoading) {
-        setDomainsList([...allDomains?.allLocalDevsList]);
-      }
-    }
-  }, [allDomains, allDomainsLoading]);
+    setDomainsListPaginated();
+
+    getTotalCount().then(({ data }) => {
+      const totalCount = data?.allLocalDevs?.totalCount;
+
+      totalCount && setCountPages(Math.ceil(totalCount / domainsPerPage));
+    });
+  }, []);
 
   return (
     <div className={styles.listContainer}>
@@ -51,32 +85,35 @@ const DomainsList = () => {
       </div>
 
       <div className={styles.listContent}>
-        {allDomainsLoading && <div className={styles.listLoader}></div>}
-
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 550, minHeight: 200 }}>
             <DomainsListHeader />
 
             <TableBody>
-              {!domainsList.length && !allDomainsLoading && (
-                <DomainsListEmpty />
-              )}
+              {!domainsList.length && <DomainsListEmpty />}
 
-              {!allDomainsLoading &&
-                domainsList.map(({ domain, available, id }) => {
-                  return (
-                    <TableRow key={id} sx={{ verticalAlign: 'text-top' }}>
-                      <DomainsListItem
-                        available={available}
-                        domain={domain}
-                        id={id}
-                      />
-                    </TableRow>
-                  );
-                })}
+              {domainsList.map(({ id, available, domain }) => {
+                return (
+                  <TableRow key={id} sx={{ verticalAlign: 'text-top' }}>
+                    <DomainsListItem
+                      available={available}
+                      domain={domain}
+                      id={id}
+                    />
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </TableContainer>
+
+        <Pagination
+          sx={{ display: 'flex', justifyContent: 'center', marginTop: '16px' }}
+          count={countPages}
+          page={currentPage}
+          shape="rounded"
+          onChange={(event, value) => handleClickPagination(event, value)}
+        />
       </div>
     </div>
   );
