@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import styles from './DomainsList.module.scss';
 
@@ -7,7 +7,7 @@ import DomainsListItem from './DomainsListItem';
 import DomainsListHeader from './DomainsListHeader';
 import DomainsListEmpty from './DomainsListEmpty';
 import {
-  Pagination,
+  CircularProgress,
   Paper,
   Table,
   TableBody,
@@ -19,27 +19,34 @@ import {
   DomainsListViewFragment,
   useGetDomainsByStringLazyQuery,
   useGetPaginatedListLazyQuery,
-  useGetTotalCountLazyQuery,
 } from './domains.generated';
 
-const domainsPerPage = 5;
+const domainsPerPage = 20;
 
 const DomainsList = () => {
-  const [domainsList, setDomainsList] = useState<DomainsListViewFragment[]>([]);
-  const [countPages, setCountPages] = useState<number>(0);
-  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [domainsList, setDomainsList] = useState<
+    (DomainsListViewFragment | null)[]
+  >([]);
+  const [endCursor, setEndCursor] = useState<string | null>(null);
+  const [hasNextPage, setHasNextPage] = useState<boolean | undefined>(false);
 
-  const [getPaginatedList] = useGetPaginatedListLazyQuery();
+  const observedBlock = useRef(null);
+  const endCursorRef = useRef(endCursor);
+  const hasNextPageRef = useRef(hasNextPage);
+
+  const [getPaginatedList, { loading: paginatedListLoading }] =
+    useGetPaginatedListLazyQuery();
   const [getFilteredDomains] = useGetDomainsByStringLazyQuery();
-  const [getTotalCount] = useGetTotalCountLazyQuery();
 
   const searchDomains = (value: string) => {
     if (value) {
       getFilteredDomains({
         variables: { includes: value, count: domainsPerPage },
       }).then(({ data }) => {
-        if (data?.allLocalDevs?.nodes instanceof Array) {
-          setDomainsList([...data?.allLocalDevs?.nodes]);
+        const list = data?.allLocalDevs?.nodes;
+
+        if (list) {
+          setDomainsList([...list]);
         }
       });
     } else {
@@ -47,36 +54,58 @@ const DomainsList = () => {
     }
   };
 
-  const setDomainsListPaginated = (offset?: number) => {
+  const setDomainsListPaginated = (after?: string | null) => {
     getPaginatedList({
       variables: {
-        offset,
+        after,
         first: domainsPerPage,
       },
     }).then(({ data }) => {
       const list = data?.allLocalDevs?.nodes;
+      const pageInfo = data?.allLocalDevs?.pageInfo;
 
-      list && setDomainsList([...list]);
+      if (list) {
+        setDomainsList([...domainsList, ...list]);
+      }
+
+      if (pageInfo) {
+        setEndCursor(pageInfo?.endCursor);
+        setHasNextPage(pageInfo?.hasNextPage);
+      }
     });
-  };
-
-  const handleClickPagination = (
-    event: ChangeEvent<unknown>,
-    value: number,
-  ) => {
-    setCurrentPage(value);
-    setDomainsListPaginated(value * domainsPerPage - domainsPerPage);
   };
 
   useEffect(() => {
+    endCursorRef.current = endCursor;
+  }, [endCursor]);
+
+  useEffect(() => {
+    hasNextPageRef.current = hasNextPage;
+  }, [hasNextPage]);
+
+  useEffect(() => {
     setDomainsListPaginated();
-
-    getTotalCount().then(({ data }) => {
-      const totalCount = data?.allLocalDevs?.totalCount;
-
-      totalCount && setCountPages(Math.ceil(totalCount / domainsPerPage));
-    });
   }, []);
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(({ isIntersecting }) => {
+      if (isIntersecting && hasNextPage) {
+        setDomainsListPaginated(endCursorRef.current);
+      }
+    });
+  });
+
+  useEffect(() => {
+    if (observer) observer.disconnect();
+
+    if (observedBlock.current) {
+      observer.observe(observedBlock.current);
+    }
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [observer]);
 
   return (
     <div className={styles.listContainer}>
@@ -90,9 +119,17 @@ const DomainsList = () => {
             <DomainsListHeader />
 
             <TableBody>
-              {!domainsList.length && <DomainsListEmpty />}
+              {!domainsList.length && !paginatedListLoading && (
+                <DomainsListEmpty />
+              )}
 
-              {domainsList.map(({ id, available, domain }) => {
+              {domainsList.map((item) => {
+                if (!item) {
+                  return null;
+                }
+
+                const { id, available, domain } = item;
+
                 return (
                   <TableRow key={id} sx={{ verticalAlign: 'text-top' }}>
                     <DomainsListItem
@@ -106,14 +143,18 @@ const DomainsList = () => {
             </TableBody>
           </Table>
         </TableContainer>
+        <div className={styles.listObserved} ref={observedBlock}></div>
 
-        <Pagination
-          sx={{ display: 'flex', justifyContent: 'center', marginTop: '16px' }}
-          count={countPages}
-          page={currentPage}
-          shape="rounded"
-          onChange={(event, value) => handleClickPagination(event, value)}
-        />
+        {paginatedListLoading && (
+          <CircularProgress
+            style={{
+              position: 'absolute',
+              left: '50%',
+              bottom: '-50px',
+              transform: 'translateX(-50%)',
+            }}
+          />
+        )}
       </div>
     </div>
   );

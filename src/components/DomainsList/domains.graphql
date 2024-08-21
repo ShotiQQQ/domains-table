@@ -6,12 +6,6 @@ query allDomains {
     }
 }
 
-query getTotalCount {
-    allLocalDevs {
-        totalCount
-    }
-}
-
 query getDomainsByString($includes: String, $count: Int) {
     allLocalDevs(filter: {domain: {includes: $includes}}, first: $count) {
         nodes {
@@ -20,8 +14,13 @@ query getDomainsByString($includes: String, $count: Int) {
     }
 }
 
-query getPaginatedList($offset: Int, $first: Int) {
-    allLocalDevs(offset: $offset, first: $first) {
+query getPaginatedList($after: Cursor, $first: Int) {
+    allLocalDevs(first: $first, after: $after) {
+        pageInfo {
+            endCursor
+            hasNextPage
+        }
+
         nodes {
             ...DomainsListView
         }
