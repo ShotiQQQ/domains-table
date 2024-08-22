@@ -4,38 +4,30 @@
   }
 
   &Search {
+    position: fixed;
+    top: 0;
+    padding-top: 24px;
+    padding-bottom: 8px;
+    background-color: #fff;
+    display: flex;
+    justify-content: space-between;
     width: 100%;
-    margin-bottom: 24px;
+    max-width: 800px;
+    z-index: 1;
   }
 
   &Container {
+    position: relative;
     max-width: 800px;
     margin: 0 auto;
+    padding-top: 60px;
   }
 
-  &Loader {
+  &Observed {
     position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    transform-origin: left top;
-    width: 71px;
-    height: 32px;
-    background-size: 100% 100%;
-    background-image: url('~/public/images/logo.svg');
-    animation-name: spiner;
-    animation-iteration-count: infinite;
-    animation-duration: 1.5s;
-    animation-timing-function: linear;
+    inset: auto 0 0 0;
+    height: 70px;
+    pointer-events: none;
   }
 }
 
-@keyframes spiner {
-  50% {
-    scale: 1.2;
-  }
-
-  to {
-    scale: 1;
-  }
-}

@@ -3,7 +3,7 @@ import { FC } from 'react';
 import styles from './DomainsListItem.module.scss';
 
 import MyButton from 'components/UI/MyButton';
-import { TableCell } from '@mui/material';
+import { Link, TableCell } from '@mui/material';
 
 import { LocalDev } from '../../../types';
 
@@ -12,7 +12,9 @@ const DomainsListItem: FC<LocalDev> = ({ id, domain, available }) => {
     <>
       <TableCell>{id}</TableCell>
       <TableCell>
-        <b>{domain}</b>
+        <Link href={domain} underline="hover" target="_blank">
+          {domain}
+        </Link>
       </TableCell>
       <TableCell align="right">
         <p

@@ -1,19 +1,44 @@
 query allDomains {
-  allLocalDevsList {
-    ...DomainsListView
-  }
+    allLocalDevs {
+        nodes {
+            ...DomainsListView
+        }
+    }
 }
 
-query getDomainsByString($includes: String = "") {
-  allLocalDevsList(filter: { domain: { includes: $includes } }) {
-    ...DomainsListView
-  }
+query getDomainsByString($includes: String, $count: Int) {
+    allLocalDevs(filter: {domain: {includes: $includes}}, first: $count) {
+        nodes {
+            ...DomainsListView
+        }
+    }
+}
+
+query getPaginatedList($after: Cursor, $first: Int) {
+    allLocalDevs(first: $first, after: $after) {
+        pageInfo {
+            endCursor
+            hasNextPage
+        }
+
+        nodes {
+            ...DomainsListView
+        }
+    }
 }
 
 fragment DomainsListView on LocalDev {
-  __typename
+    __typename
 
-  id
-  domain
-  available
+    id
+    domain
+    available
+}
+
+mutation CreateNewDomain($localDev: LocalDevInput!) {
+    createLocalDev(input: {localDev: $localDev}) {
+        localDev {
+            ...DomainsListView
+        }
+    }
 }

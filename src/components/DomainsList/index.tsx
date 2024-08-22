@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import styles from './DomainsList.module.scss';
 
@@ -6,64 +6,148 @@ import DomainsListSearch from './DomainsListSearch';
 import DomainsListItem from './DomainsListItem';
 import DomainsListHeader from './DomainsListHeader';
 import DomainsListEmpty from './DomainsListEmpty';
+import Modal from '../Modal';
 import {
+  CircularProgress,
+  IconButton,
   Paper,
   Table,
   TableBody,
   TableContainer,
   TableRow,
 } from '@mui/material';
+import { AddCircle } from '@mui/icons-material';
 
 import {
   DomainsListViewFragment,
-  useAllDomainsQuery,
   useGetDomainsByStringLazyQuery,
+  useGetPaginatedListLazyQuery,
 } from './domains.generated';
 
-const DomainsList = () => {
-  const [domainsList, setDomainsList] = useState<DomainsListViewFragment[]>([]);
+const domainsPerPage = 20;
+const modalTitle = 'Добавить запись в таблицу';
 
-  const { data: allDomains, loading: allDomainsLoading } = useAllDomainsQuery();
+const DomainsList = () => {
+  const [domainsList, setDomainsList] = useState<
+    (DomainsListViewFragment | null)[]
+  >([]);
+  const [endCursor, setEndCursor] = useState<string | null>(null);
+  const [hasNextPage, setHasNextPage] = useState<boolean | undefined>(false);
+  const [isOpenModal, setIsOpenModal] = useState(false);
+
+  const endCursorRef = useRef(endCursor);
+  const hasNextPageRef = useRef(hasNextPage);
+  const observedBlockRef = useRef(null);
+
+  const [getPaginatedList, { loading: paginatedListLoading }] =
+    useGetPaginatedListLazyQuery();
   const [getFilteredDomains] = useGetDomainsByStringLazyQuery();
 
+  const handleOpenModal = () => {
+    setIsOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsOpenModal(false);
+  };
+
   const searchDomains = (value: string) => {
-    getFilteredDomains({
-      variables: { includes: value },
+    if (value) {
+      getFilteredDomains({
+        variables: { includes: value, count: domainsPerPage },
+      }).then(({ data }) => {
+        const list = data?.allLocalDevs?.nodes;
+
+        if (list) {
+          setDomainsList([...list]);
+        }
+      });
+    } else {
+      setDomainsListPaginated();
+    }
+  };
+
+  const setDomainsListPaginated = (after?: string | null) => {
+    getPaginatedList({
+      variables: {
+        after,
+        first: domainsPerPage,
+      },
     }).then(({ data }) => {
-      if (data?.allLocalDevsList instanceof Array) {
-        setDomainsList([...data?.allLocalDevsList]);
+      const list = data?.allLocalDevs?.nodes;
+      const pageInfo = data?.allLocalDevs?.pageInfo;
+
+      if (list) {
+        setDomainsList((prevState) => [...prevState, ...list]);
+      }
+
+      if (pageInfo) {
+        setEndCursor(pageInfo?.endCursor);
+        setHasNextPage(pageInfo?.hasNextPage);
       }
     });
   };
 
   useEffect(() => {
-    if (!allDomainsLoading) {
-      if (allDomains?.allLocalDevsList instanceof Array && !allDomainsLoading) {
-        setDomainsList([...allDomains?.allLocalDevsList]);
+    endCursorRef.current = endCursor;
+  }, [endCursor]);
+
+  useEffect(() => {
+    hasNextPageRef.current = hasNextPage;
+  }, [hasNextPage]);
+
+  useEffect(() => {
+    setDomainsListPaginated();
+  }, []);
+
+  useEffect(() => {
+    if (!paginatedListLoading) {
+      const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !!domainsList.length) {
+          setDomainsListPaginated(endCursorRef.current);
+        }
+      }) as IntersectionObserver;
+
+      if (observedBlockRef.current) {
+        observer.observe(observedBlockRef.current);
       }
     }
-  }, [allDomains, allDomainsLoading]);
+  }, [hasNextPage]);
 
   return (
-    <div className={styles.listContainer}>
-      <div className={styles.listSearch}>
-        <DomainsListSearch searchDomains={searchDomains} />
-      </div>
+    <>
+      <Modal
+        isOpen={isOpenModal}
+        onClose={handleCloseModal}
+        title={modalTitle}
+      />
 
-      <div className={styles.listContent}>
-        {allDomainsLoading && <div className={styles.listLoader}></div>}
+      <div className={styles.listContainer}>
+        <div className={styles.listSearch}>
+          <DomainsListSearch searchDomains={searchDomains} />
 
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 550, minHeight: 200 }}>
-            <DomainsListHeader />
+          <IconButton title={modalTitle} onClick={handleOpenModal}>
+            <AddCircle color="primary" />
+          </IconButton>
+        </div>
 
-            <TableBody>
-              {!domainsList.length && !allDomainsLoading && (
-                <DomainsListEmpty />
-              )}
+        <div className={styles.listContent}>
+          <TableContainer component={Paper}>
+            <Table sx={{ minWidth: 550, minHeight: 200 }}>
+              <DomainsListHeader />
 
-              {!allDomainsLoading &&
-                domainsList.map(({ domain, available, id }) => {
+              <TableBody>
+                {!domainsList.length && !paginatedListLoading && (
+                  <DomainsListEmpty />
+                )}
+
+                {domainsList.map((item) => {
+                  if (!item) {
+                    return null;
+                  }
+
+                  const { id, available, domain } = item;
+
                   return (
                     <TableRow key={id} sx={{ verticalAlign: 'text-top' }}>
                       <DomainsListItem
@@ -74,11 +158,25 @@ const DomainsList = () => {
                     </TableRow>
                   );
                 })}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableBody>
+            </Table>
+          </TableContainer>
+
+          <div className={styles.listObserved} ref={observedBlockRef}></div>
+
+          {paginatedListLoading && (
+            <CircularProgress
+              style={{
+                position: 'absolute',
+                left: '50%',
+                bottom: '-50px',
+                transform: 'translateX(-50%)',
+              }}
+            />
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
