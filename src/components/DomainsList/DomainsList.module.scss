@@ -4,13 +4,23 @@
   }
 
   &Search {
+    position: fixed;
+    top: 0;
+    padding-top: 24px;
+    padding-bottom: 8px;
+    background-color: #fff;
+    display: flex;
+    justify-content: space-between;
     width: 100%;
-    margin-bottom: 24px;
+    max-width: 800px;
+    z-index: 1;
   }
 
   &Container {
+    position: relative;
     max-width: 800px;
     margin: 0 auto;
+    padding-top: 60px;
   }
 
   &Observed {
