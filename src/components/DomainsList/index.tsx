@@ -8,12 +8,14 @@ import DomainsListHeader from './DomainsListHeader';
 import DomainsListEmpty from './DomainsListEmpty';
 import {
   CircularProgress,
+  IconButton,
   Paper,
   Table,
   TableBody,
   TableContainer,
   TableRow,
 } from '@mui/material';
+import { AddCircle } from '@mui/icons-material';
 
 import {
   DomainsListViewFragment,
@@ -30,9 +32,9 @@ const DomainsList = () => {
   const [endCursor, setEndCursor] = useState<string | null>(null);
   const [hasNextPage, setHasNextPage] = useState<boolean | undefined>(false);
 
-  const observedBlock = useRef(null);
   const endCursorRef = useRef(endCursor);
   const hasNextPageRef = useRef(hasNextPage);
+  const observedBlockRef = useRef(null);
 
   const [getPaginatedList, { loading: paginatedListLoading }] =
     useGetPaginatedListLazyQuery();
@@ -65,7 +67,7 @@ const DomainsList = () => {
       const pageInfo = data?.allLocalDevs?.pageInfo;
 
       if (list) {
-        setDomainsList([...domainsList, ...list]);
+        setDomainsList((prevState) => [...prevState, ...list]);
       }
 
       if (pageInfo) {
@@ -87,30 +89,28 @@ const DomainsList = () => {
     setDomainsListPaginated();
   }, []);
 
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(({ isIntersecting }) => {
-      if (isIntersecting && hasNextPage) {
-        setDomainsListPaginated(endCursorRef.current);
-      }
-    });
-  });
-
   useEffect(() => {
-    if (observer) observer.disconnect();
+    if (!paginatedListLoading) {
+      const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !!domainsList.length) {
+          setDomainsListPaginated(endCursorRef.current);
+        }
+      }) as IntersectionObserver;
 
-    if (observedBlock.current) {
-      observer.observe(observedBlock.current);
+      if (observedBlockRef.current) {
+        observer.observe(observedBlockRef.current);
+      }
     }
-
-    return () => {
-      observer.disconnect();
-    };
-  }, [observer]);
+  }, [hasNextPage]);
 
   return (
     <div className={styles.listContainer}>
       <div className={styles.listSearch}>
         <DomainsListSearch searchDomains={searchDomains} />
+
+        <IconButton>
+          <AddCircle color="primary" aria-label="Добавить запись в таблицу" />
+        </IconButton>
       </div>
 
       <div className={styles.listContent}>
@@ -143,7 +143,8 @@ const DomainsList = () => {
             </TableBody>
           </Table>
         </TableContainer>
-        <div className={styles.listObserved} ref={observedBlock}></div>
+
+        <div className={styles.listObserved} ref={observedBlockRef}></div>
 
         {paginatedListLoading && (
           <CircularProgress
