@@ -6,6 +6,7 @@ import DomainsListSearch from './DomainsListSearch';
 import DomainsListItem from './DomainsListItem';
 import DomainsListHeader from './DomainsListHeader';
 import DomainsListEmpty from './DomainsListEmpty';
+import Modal from '../Modal';
 import {
   CircularProgress,
   IconButton,
@@ -24,6 +25,7 @@ import {
 } from './domains.generated';
 
 const domainsPerPage = 20;
+const modalTitle = 'Добавить запись в таблицу';
 
 const DomainsList = () => {
   const [domainsList, setDomainsList] = useState<
@@ -31,6 +33,7 @@ const DomainsList = () => {
   >([]);
   const [endCursor, setEndCursor] = useState<string | null>(null);
   const [hasNextPage, setHasNextPage] = useState<boolean | undefined>(false);
+  const [isOpenModal, setIsOpenModal] = useState(false);
 
   const endCursorRef = useRef(endCursor);
   const hasNextPageRef = useRef(hasNextPage);
@@ -39,6 +42,14 @@ const DomainsList = () => {
   const [getPaginatedList, { loading: paginatedListLoading }] =
     useGetPaginatedListLazyQuery();
   const [getFilteredDomains] = useGetDomainsByStringLazyQuery();
+
+  const handleOpenModal = () => {
+    setIsOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsOpenModal(false);
+  };
 
   const searchDomains = (value: string) => {
     if (value) {
@@ -104,60 +115,68 @@ const DomainsList = () => {
   }, [hasNextPage]);
 
   return (
-    <div className={styles.listContainer}>
-      <div className={styles.listSearch}>
-        <DomainsListSearch searchDomains={searchDomains} />
+    <>
+      <Modal
+        isOpen={isOpenModal}
+        onClose={handleCloseModal}
+        title={modalTitle}
+      />
 
-        <IconButton>
-          <AddCircle color="primary" aria-label="Добавить запись в таблицу" />
-        </IconButton>
+      <div className={styles.listContainer}>
+        <div className={styles.listSearch}>
+          <DomainsListSearch searchDomains={searchDomains} />
+
+          <IconButton title={modalTitle} onClick={handleOpenModal}>
+            <AddCircle color="primary" />
+          </IconButton>
+        </div>
+
+        <div className={styles.listContent}>
+          <TableContainer component={Paper}>
+            <Table sx={{ minWidth: 550, minHeight: 200 }}>
+              <DomainsListHeader />
+
+              <TableBody>
+                {!domainsList.length && !paginatedListLoading && (
+                  <DomainsListEmpty />
+                )}
+
+                {domainsList.map((item) => {
+                  if (!item) {
+                    return null;
+                  }
+
+                  const { id, available, domain } = item;
+
+                  return (
+                    <TableRow key={id} sx={{ verticalAlign: 'text-top' }}>
+                      <DomainsListItem
+                        available={available}
+                        domain={domain}
+                        id={id}
+                      />
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+
+          <div className={styles.listObserved} ref={observedBlockRef}></div>
+
+          {paginatedListLoading && (
+            <CircularProgress
+              style={{
+                position: 'absolute',
+                left: '50%',
+                bottom: '-50px',
+                transform: 'translateX(-50%)',
+              }}
+            />
+          )}
+        </div>
       </div>
-
-      <div className={styles.listContent}>
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 550, minHeight: 200 }}>
-            <DomainsListHeader />
-
-            <TableBody>
-              {!domainsList.length && !paginatedListLoading && (
-                <DomainsListEmpty />
-              )}
-
-              {domainsList.map((item) => {
-                if (!item) {
-                  return null;
-                }
-
-                const { id, available, domain } = item;
-
-                return (
-                  <TableRow key={id} sx={{ verticalAlign: 'text-top' }}>
-                    <DomainsListItem
-                      available={available}
-                      domain={domain}
-                      id={id}
-                    />
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
-
-        <div className={styles.listObserved} ref={observedBlockRef}></div>
-
-        {paginatedListLoading && (
-          <CircularProgress
-            style={{
-              position: 'absolute',
-              left: '50%',
-              bottom: '-50px',
-              transform: 'translateX(-50%)',
-            }}
-          />
-        )}
-      </div>
-    </div>
+    </>
   );
 };
 
