@@ -34,3 +34,11 @@ fragment DomainsListView on LocalDev {
     domain
     available
 }
+
+mutation CreateNewDomain($localDev: LocalDevInput!) {
+    createLocalDev(input: {localDev: $localDev}) {
+        localDev {
+            ...DomainsListView
+        }
+    }
+}
