@@ -6,6 +6,7 @@ import MyButton from 'components/UI/MyButton';
 import { Link, TableCell } from '@mui/material';
 
 import { LocalDev } from '../../../types';
+import { RestartAlt } from '@mui/icons-material';
 
 const DomainsListItem: FC<LocalDev> = ({ id, domain, available }) => {
   return (
@@ -16,7 +17,7 @@ const DomainsListItem: FC<LocalDev> = ({ id, domain, available }) => {
           {domain}
         </Link>
       </TableCell>
-      <TableCell align="right">
+      <TableCell>
         <p
           className={styles.itemText}
           style={{
@@ -28,7 +29,9 @@ const DomainsListItem: FC<LocalDev> = ({ id, domain, available }) => {
         </p>
       </TableCell>
       <TableCell align="right">
-        <MyButton size="small">Обновить статус</MyButton>
+        <MyButton size="small">
+          <RestartAlt />
+        </MyButton>
       </TableCell>
     </>
   );

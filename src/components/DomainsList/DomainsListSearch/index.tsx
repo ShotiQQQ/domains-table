@@ -2,6 +2,8 @@ import { ChangeEvent, FC, useState } from 'react';
 
 import MyInput from '../../UI/MyInput';
 import MyButton from '../../UI/MyButton';
+import Form from '../../UI/Form';
+import { Search } from '@mui/icons-material';
 
 interface ISearchProps {
   searchDomains: (value: string) => void;
@@ -14,27 +16,22 @@ const DomainsListSearch: FC<ISearchProps> = ({ searchDomains }) => {
     setSearchInputValue(event.target.value);
   };
 
-  const submitForm = (event: ChangeEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const submitForm = () => {
     searchDomains(searchInputValue);
   };
 
   return (
-    <form onSubmit={submitForm}>
+    <Form>
       <MyInput
         value={searchInputValue}
         placeholder="Поиск"
         onChange={setCurrentSearchInputValue}
       />
 
-      <MyButton
-        color="success"
-        style={{ marginLeft: '12px' }}
-        onClick={() => searchDomains(searchInputValue)}
-      >
-        Поиск
+      <MyButton style={{ marginLeft: '12px' }} onClick={submitForm}>
+        <Search />
       </MyButton>
-    </form>
+    </Form>
   );
 };
 

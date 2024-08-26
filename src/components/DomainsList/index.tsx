@@ -23,9 +23,10 @@ import {
   useGetDomainsByStringLazyQuery,
   useGetPaginatedListLazyQuery,
 } from './domains.generated';
+import DomainsListAddNewItem from './DomainsListAddNewItem';
 
 const domainsPerPage = 20;
-const modalTitle = 'Добавить запись в таблицу';
+const modalTitle = 'Добавить новый домен';
 
 const DomainsList = () => {
   const [domainsList, setDomainsList] = useState<
@@ -116,53 +117,61 @@ const DomainsList = () => {
 
   return (
     <>
-      <Modal
-        isOpen={isOpenModal}
-        onClose={handleCloseModal}
-        title={modalTitle}
-      />
+      <Modal isOpen={isOpenModal} onClose={handleCloseModal} title={modalTitle}>
+        <DomainsListAddNewItem closeModal={handleCloseModal} />
+      </Modal>
 
       <div className={styles.listContainer}>
         <div className={styles.listSearch}>
-          <DomainsListSearch searchDomains={searchDomains} />
+          <div className={styles.listContainerTitle}>
+            <h1 className={styles.listTitle}>Мониторинг доменов</h1>
+            <IconButton title={modalTitle} onClick={handleOpenModal}>
+              <AddCircle color="primary" />
+            </IconButton>
+          </div>
 
-          <IconButton title={modalTitle} onClick={handleOpenModal}>
-            <AddCircle color="primary" />
-          </IconButton>
+          <DomainsListSearch searchDomains={searchDomains} />
         </div>
 
         <div className={styles.listContent}>
-          <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 550, minHeight: 200 }}>
-              <DomainsListHeader />
+          <Paper sx={{ overflow: 'hidden' }}>
+            <TableContainer sx={{ maxHeight: 440 }}>
+              <div className={styles.listWrapper}>
+                <Table sx={{ minWidth: 550, minHeight: 200 }} stickyHeader>
+                  <DomainsListHeader />
 
-              <TableBody>
-                {!domainsList.length && !paginatedListLoading && (
-                  <DomainsListEmpty />
-                )}
+                  <TableBody>
+                    {!domainsList.length && !paginatedListLoading && (
+                      <DomainsListEmpty />
+                    )}
 
-                {domainsList.map((item) => {
-                  if (!item) {
-                    return null;
-                  }
+                    {domainsList.map((item) => {
+                      if (!item) {
+                        return null;
+                      }
 
-                  const { id, available, domain } = item;
+                      const { id, available, domain } = item;
 
-                  return (
-                    <TableRow key={id} sx={{ verticalAlign: 'text-top' }}>
-                      <DomainsListItem
-                        available={available}
-                        domain={domain}
-                        id={id}
-                      />
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                      return (
+                        <TableRow key={id} sx={{ verticalAlign: 'text-top' }}>
+                          <DomainsListItem
+                            available={available}
+                            domain={domain}
+                            id={id}
+                          />
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
 
-          <div className={styles.listObserved} ref={observedBlockRef}></div>
+                <div
+                  className={styles.listObserved}
+                  ref={observedBlockRef}
+                ></div>
+              </div>
+            </TableContainer>
+          </Paper>
 
           {paginatedListLoading && (
             <CircularProgress
