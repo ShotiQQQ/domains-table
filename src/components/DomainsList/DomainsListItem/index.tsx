@@ -29,7 +29,7 @@ const DomainsListItem: FC<LocalDev> = ({ id, domain, available }) => {
         </p>
       </TableCell>
       <TableCell align="right">
-        <MyButton size="small">
+        <MyButton size="small" style={{ minWidth: 'auto' }}>
           <RestartAlt />
         </MyButton>
       </TableCell>

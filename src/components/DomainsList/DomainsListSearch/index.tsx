@@ -28,7 +28,10 @@ const DomainsListSearch: FC<ISearchProps> = ({ searchDomains }) => {
         onChange={setCurrentSearchInputValue}
       />
 
-      <MyButton style={{ marginLeft: '12px' }} onClick={submitForm}>
+      <MyButton
+        style={{ marginLeft: '12px', minWidth: 'auto' }}
+        onClick={submitForm}
+      >
         <Search />
       </MyButton>
     </Form>

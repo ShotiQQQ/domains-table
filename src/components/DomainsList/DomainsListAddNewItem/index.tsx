@@ -18,7 +18,7 @@ const DomainsListAddNewItem: FC<INewItemProps> = ({ closeModal }) => {
   const [domainNameValue, setDomainNameValue] = useState('');
   const [isShownDone, setIsShownDone] = useState(false);
 
-  const [createNewDomain] = useCreateNewDomainMutation();
+  const [createNewDomain, { loading }] = useCreateNewDomainMutation();
 
   const addNewDomain = () => {
     if (domainNameValue) {
@@ -64,6 +64,7 @@ const DomainsListAddNewItem: FC<INewItemProps> = ({ closeModal }) => {
           type="submit"
           style={{ display: 'block', margin: '0 auto' }}
           onClick={addNewDomain}
+          disabled={loading || isShownDone}
         >
           Добавить
         </MyButton>
