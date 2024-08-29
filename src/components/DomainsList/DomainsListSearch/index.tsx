@@ -1,39 +1,22 @@
-import { ChangeEvent, FC, useState } from 'react';
+import { ChangeEvent, FC } from 'react';
 
 import MyInput from '../../UI/MyInput';
-import MyButton from '../../UI/MyButton';
 import Form from '../../UI/Form';
-import { Search } from '@mui/icons-material';
 
 interface ISearchProps {
-  searchDomains: (value: string) => void;
+  value: string;
+  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
-const DomainsListSearch: FC<ISearchProps> = ({ searchDomains }) => {
-  const [searchInputValue, setSearchInputValue] = useState('');
-
-  const setCurrentSearchInputValue = (event: ChangeEvent<HTMLInputElement>) => {
-    setSearchInputValue(event.target.value);
-  };
-
-  const submitForm = () => {
-    searchDomains(searchInputValue);
-  };
-
+const DomainsListSearch: FC<ISearchProps> = ({ value, onChange }) => {
   return (
-    <Form>
+    <Form style={{ display: 'flex', gap: '12px' }}>
       <MyInput
-        value={searchInputValue}
-        placeholder="Поиск"
-        onChange={setCurrentSearchInputValue}
+        value={value}
+        placeholder="Найти домен"
+        onChange={onChange}
+        sx={{ width: '100%' }}
       />
-
-      <MyButton
-        style={{ marginLeft: '12px', minWidth: 'auto' }}
-        onClick={submitForm}
-      >
-        <Search />
-      </MyButton>
     </Form>
   );
 };

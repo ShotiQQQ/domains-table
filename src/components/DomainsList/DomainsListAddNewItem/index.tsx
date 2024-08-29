@@ -57,6 +57,7 @@ const DomainsListAddNewItem: FC<INewItemProps> = ({ closeModal }) => {
           value={domainNameValue}
           placeholder="Имя домена"
           onChange={handleChangeInput}
+          required={true}
           sx={{ marginBottom: '24px' }}
         />
 

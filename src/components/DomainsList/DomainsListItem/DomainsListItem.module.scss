@@ -1,6 +1,17 @@
 .item {
-  &Text {
-    font-size: 14px;
-    margin: 0;
+  &Row {
+    &:hover {
+      @media (min-width: 1024px) {
+        .itemButton {
+          opacity: 1;
+        }
+      }
+    }
+  }
+
+  &Button {
+    @media (min-width: 1024px) {
+      opacity: 0;
+    }
   }
 }

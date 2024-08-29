@@ -1,21 +1,30 @@
 import { ChangeEvent, FC } from 'react';
 
-import { Input, SxProps } from '@mui/material';
+import { SxProps, TextField } from '@mui/material';
 
 interface IInputProps {
   value: string;
   placeholder: string;
-  sx?: SxProps;
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  sx?: SxProps;
+  required?: boolean;
 }
 
-const MyInput: FC<IInputProps> = ({ value, onChange, placeholder, sx }) => {
+const MyInput: FC<IInputProps> = ({
+  value,
+  onChange,
+  placeholder,
+  sx,
+  required,
+}) => {
   return (
-    <Input
-      required
+    <TextField
+      required={required}
+      variant="outlined"
+      size="small"
       onChange={onChange}
       value={value}
-      placeholder={placeholder}
+      label={placeholder}
       sx={sx}
     />
   );

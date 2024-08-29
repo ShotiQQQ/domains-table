@@ -4,17 +4,18 @@
   }
 
   &Search {
-    padding-top: 24px;
-    padding-bottom: 8px;
+    padding-top: 12px;
+    padding-bottom: 12px;
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: 8px;
     z-index: 1;
   }
 
   &ContainerTitle {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 4px;
   }
 
   &Title {
@@ -24,7 +25,7 @@
 
   &Container {
     position: relative;
-    max-width: 800px;
+    max-width: 660px;
     margin: 0 auto;
   }
 
@@ -34,7 +35,7 @@
 
   &Observed {
     position: absolute;
-    inset: auto 0 700px 0;
+    inset: auto 0 10% 0;
     height: 70px;
     pointer-events: none;
   }

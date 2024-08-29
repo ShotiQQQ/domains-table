@@ -21,6 +21,8 @@ interface IButtonProps {
   size?: TButtonSize;
   type?: 'submit' | 'button';
   disabled?: boolean;
+  variant?: 'contained' | 'outlined' | 'text';
+  className?: string;
 }
 
 const MyButton: FC<IButtonProps> = ({
@@ -30,6 +32,8 @@ const MyButton: FC<IButtonProps> = ({
   color,
   size,
   disabled,
+  className,
+  variant = 'contained',
   type = 'button',
 }) => {
   return (
@@ -40,7 +44,8 @@ const MyButton: FC<IButtonProps> = ({
       size={size}
       disabled={disabled}
       onClick={onClick}
-      variant="contained"
+      variant={variant}
+      className={className}
     >
       {children}
     </Button>

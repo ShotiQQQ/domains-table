@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
 
 import styles from './DomainsList.module.scss';
 
@@ -14,35 +14,36 @@ import {
   Table,
   TableBody,
   TableContainer,
-  TableRow,
 } from '@mui/material';
 import { AddCircle } from '@mui/icons-material';
 
 import {
   DomainsListViewFragment,
-  useGetDomainsByStringLazyQuery,
-  useGetPaginatedListLazyQuery,
+  useGetDomainsLazyQuery,
 } from './domains.generated';
 import DomainsListAddNewItem from './DomainsListAddNewItem';
 
-const domainsPerPage = 20;
+const domainsPerPage = 50;
 const modalTitle = 'Добавить новый домен';
 
 const DomainsList = () => {
   const [domainsList, setDomainsList] = useState<
     (DomainsListViewFragment | null)[]
   >([]);
+  const [searchValue, setSearchValue] = useState('');
   const [endCursor, setEndCursor] = useState<string | null>(null);
   const [hasNextPage, setHasNextPage] = useState<boolean | undefined>(false);
   const [isOpenModal, setIsOpenModal] = useState(false);
+  const [isFirstRender, setIsFirstRender] = useState(true);
 
   const endCursorRef = useRef(endCursor);
   const hasNextPageRef = useRef(hasNextPage);
+  const searchValueRef = useRef(searchValue);
   const observedBlockRef = useRef(null);
+  const tableContainerRef = useRef<HTMLDivElement>(null);
 
-  const [getPaginatedList, { loading: paginatedListLoading }] =
-    useGetPaginatedListLazyQuery();
-  const [getFilteredDomains] = useGetDomainsByStringLazyQuery();
+  const [getDomains, { loading }] = useGetDomainsLazyQuery();
+  const loadingRef = useRef(loading);
 
   const handleOpenModal = () => {
     setIsOpenModal(true);
@@ -52,34 +53,32 @@ const DomainsList = () => {
     setIsOpenModal(false);
   };
 
-  const searchDomains = (value: string) => {
-    if (value) {
-      getFilteredDomains({
-        variables: { includes: value, count: domainsPerPage },
-      }).then(({ data }) => {
-        const list = data?.allLocalDevs?.nodes;
-
-        if (list) {
-          setDomainsList([...list]);
-        }
-      });
-    } else {
-      setDomainsListPaginated();
-    }
-  };
-
-  const setDomainsListPaginated = (after?: string | null) => {
-    getPaginatedList({
+  const getDomainsList = (type: 'search' | 'default' = 'default') => {
+    getDomains({
       variables: {
-        after,
+        after: type === 'default' ? endCursorRef.current : null,
         first: domainsPerPage,
+        includes: searchValueRef.current,
       },
     }).then(({ data }) => {
       const list = data?.allLocalDevs?.nodes;
       const pageInfo = data?.allLocalDevs?.pageInfo;
 
       if (list) {
-        setDomainsList((prevState) => [...prevState, ...list]);
+        if (type === 'search') {
+          if (
+            tableContainerRef.current &&
+            tableContainerRef.current.scrollTop !== 0
+          ) {
+            tableContainerRef.current.scrollTo({
+              top: 0,
+              behavior: 'smooth',
+            });
+          }
+          setDomainsList([...list]);
+        } else {
+          setDomainsList((prevState) => [...prevState, ...list]);
+        }
       }
 
       if (pageInfo) {
@@ -88,6 +87,14 @@ const DomainsList = () => {
       }
     });
   };
+
+  const handleSearch = (event: ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(event.target.value);
+  };
+
+  useEffect(() => {
+    loadingRef.current = loading;
+  }, [loading]);
 
   useEffect(() => {
     endCursorRef.current = endCursor;
@@ -98,14 +105,40 @@ const DomainsList = () => {
   }, [hasNextPage]);
 
   useEffect(() => {
-    setDomainsListPaginated();
+    searchValueRef.current = searchValue;
+  }, [searchValue]);
+
+  useEffect(() => {
+    getDomainsList();
   }, []);
 
   useEffect(() => {
-    if (!paginatedListLoading) {
+    let timeout: ReturnType<typeof setTimeout> | null = null;
+
+    if (!isFirstRender) {
+      timeout = setTimeout(() => {
+        getDomainsList('search');
+      }, 300);
+    }
+
+    setIsFirstRender(false);
+
+    return () => {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+    };
+  }, [searchValue]);
+
+  useEffect(() => {
+    if (!loading) {
       const observer = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasNextPage && !!domainsList.length) {
-          setDomainsListPaginated(endCursorRef.current);
+        if (
+          entries[0].isIntersecting &&
+          hasNextPageRef.current &&
+          !loadingRef.current
+        ) {
+          getDomainsList();
         }
       }) as IntersectionObserver;
 
@@ -113,7 +146,7 @@ const DomainsList = () => {
         observer.observe(observedBlockRef.current);
       }
     }
-  }, [hasNextPage]);
+  }, [observedBlockRef.current]);
 
   return (
     <>
@@ -124,26 +157,24 @@ const DomainsList = () => {
       <div className={styles.listContainer}>
         <div className={styles.listSearch}>
           <div className={styles.listContainerTitle}>
-            <h1 className={styles.listTitle}>Мониторинг доменов</h1>
+            <h1 className={styles.listTitle}>Управление доменами</h1>
             <IconButton title={modalTitle} onClick={handleOpenModal}>
               <AddCircle color="primary" />
             </IconButton>
           </div>
 
-          <DomainsListSearch searchDomains={searchDomains} />
+          <DomainsListSearch value={searchValue} onChange={handleSearch} />
         </div>
 
         <div className={styles.listContent}>
           <Paper sx={{ overflow: 'hidden' }}>
-            <TableContainer sx={{ maxHeight: 440 }}>
+            <TableContainer sx={{ maxHeight: 440 }} ref={tableContainerRef}>
               <div className={styles.listWrapper}>
-                <Table sx={{ minWidth: 550, minHeight: 200 }} stickyHeader>
+                <Table sx={{ minWidth: 490, minHeight: 200 }} stickyHeader>
                   <DomainsListHeader />
 
                   <TableBody>
-                    {!domainsList.length && !paginatedListLoading && (
-                      <DomainsListEmpty />
-                    )}
+                    {!domainsList.length && !loading && <DomainsListEmpty />}
 
                     {domainsList.map((item) => {
                       if (!item) {
@@ -153,13 +184,12 @@ const DomainsList = () => {
                       const { id, available, domain } = item;
 
                       return (
-                        <TableRow key={id} sx={{ verticalAlign: 'text-top' }}>
-                          <DomainsListItem
-                            available={available}
-                            domain={domain}
-                            id={id}
-                          />
-                        </TableRow>
+                        <DomainsListItem
+                          available={available}
+                          domain={domain}
+                          id={id}
+                          key={id}
+                        />
                       );
                     })}
                   </TableBody>
@@ -173,7 +203,7 @@ const DomainsList = () => {
             </TableContainer>
           </Paper>
 
-          {paginatedListLoading && (
+          {loading && (
             <CircularProgress
               style={{
                 position: 'absolute',
