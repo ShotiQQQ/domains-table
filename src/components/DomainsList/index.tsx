@@ -22,6 +22,7 @@ import {
   useGetDomainsLazyQuery,
 } from './domains.generated';
 import DomainsListAddNewItem from './DomainsListAddNewItem';
+import { scrollElementToTop } from '../../utils/scrollElementToTop';
 
 const domainsPerPage = 50;
 const modalTitle = 'Добавить новый домен';
@@ -70,10 +71,7 @@ const DomainsList = () => {
             tableContainerRef.current &&
             tableContainerRef.current.scrollTop !== 0
           ) {
-            tableContainerRef.current.scrollTo({
-              top: 0,
-              behavior: 'smooth',
-            });
+            scrollElementToTop(tableContainerRef.current);
           }
           setDomainsList([...list]);
         } else {
@@ -168,7 +166,10 @@ const DomainsList = () => {
 
         <div className={styles.listContent}>
           <Paper sx={{ overflow: 'hidden' }}>
-            <TableContainer sx={{ maxHeight: 440 }} ref={tableContainerRef}>
+            <TableContainer
+              sx={{ maxHeight: 440, overscrollBehavior: 'none' }}
+              ref={tableContainerRef}
+            >
               <div className={styles.listWrapper}>
                 <Table sx={{ minWidth: 490, minHeight: 200 }} stickyHeader>
                   <DomainsListHeader />
