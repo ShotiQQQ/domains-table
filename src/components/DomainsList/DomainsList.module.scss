@@ -4,28 +4,38 @@
   }
 
   &Search {
-    position: fixed;
-    top: 0;
-    padding-top: 24px;
-    padding-bottom: 8px;
-    background-color: #fff;
+    padding-top: 12px;
+    padding-bottom: 12px;
     display: flex;
-    justify-content: space-between;
-    width: 100%;
-    max-width: 800px;
+    flex-direction: column;
+    gap: 8px;
     z-index: 1;
+  }
+
+  &ContainerTitle {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  &Title {
+    margin: 0;
+    font-size: 24px;
   }
 
   &Container {
     position: relative;
-    max-width: 800px;
+    max-width: 660px;
     margin: 0 auto;
-    padding-top: 60px;
+  }
+
+  &Wrapper {
+    position: relative;
   }
 
   &Observed {
     position: absolute;
-    inset: auto 0 0 0;
+    inset: auto 0 10% 0;
     height: 70px;
     pointer-events: none;
   }

@@ -3,34 +3,38 @@ import { FC } from 'react';
 import styles from './DomainsListItem.module.scss';
 
 import MyButton from 'components/UI/MyButton';
-import { Link, TableCell } from '@mui/material';
-
+import { Link, TableCell, TableRow } from '@mui/material';
 import { LocalDev } from '../../../types';
+import { RestartAlt } from '@mui/icons-material';
+import DomainsListStatus from '../DomainsListStatus';
 
 const DomainsListItem: FC<LocalDev> = ({ id, domain, available }) => {
   return (
-    <>
+    <TableRow
+      sx={{ verticalAlign: 'text-top' }}
+      hover
+      className={styles.itemRow}
+    >
       <TableCell>{id}</TableCell>
       <TableCell>
         <Link href={domain} underline="hover" target="_blank">
           {domain}
         </Link>
       </TableCell>
+      <TableCell>
+        <DomainsListStatus isAvailable={available} />
+      </TableCell>
       <TableCell align="right">
-        <p
-          className={styles.itemText}
-          style={{
-            color: available ? '#2e7d32' : '#d32f2f',
-            margin: 0,
-          }}
+        <MyButton
+          size="small"
+          variant="text"
+          className={styles.itemButton}
+          style={{ minWidth: 'auto' }}
         >
-          {available ? 'Доступен' : 'Недоступен'}
-        </p>
+          <RestartAlt />
+        </MyButton>
       </TableCell>
-      <TableCell align="right">
-        <MyButton size="small">Обновить статус</MyButton>
-      </TableCell>
-    </>
+    </TableRow>
   );
 };
 

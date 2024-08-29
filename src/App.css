@@ -1,5 +1,5 @@
 .App {
-    padding: 24px 24px 70px;
+    padding: 24px 12px 70px;
     min-height: 100vh;
 
     @supports (min-height: 100dvh) {

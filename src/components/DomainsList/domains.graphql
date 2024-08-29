@@ -1,29 +1,16 @@
-query allDomains {
-    allLocalDevs {
+query GetDomains($after: Cursor, $first: Int, $includes: String) {
+    allLocalDevs(
+        after: $after
+        first: $first
+        filter: {domain: {includes: $includes}}
+    ) {
         nodes {
             ...DomainsListView
         }
-    }
-}
-
-query getDomainsByString($includes: String, $count: Int) {
-    allLocalDevs(filter: {domain: {includes: $includes}}, first: $count) {
-        nodes {
-            ...DomainsListView
-        }
-    }
-}
-
-query getPaginatedList($after: Cursor, $first: Int) {
-    allLocalDevs(first: $first, after: $after) {
         pageInfo {
-            endCursor
-            hasNextPage
+            ...PageInfo
         }
-
-        nodes {
-            ...DomainsListView
-        }
+        totalCount
     }
 }
 
@@ -33,6 +20,13 @@ fragment DomainsListView on LocalDev {
     id
     domain
     available
+}
+
+fragment PageInfo on PageInfo {
+    __typename
+
+    hasNextPage
+    endCursor
 }
 
 mutation CreateNewDomain($localDev: LocalDevInput!) {

@@ -15,10 +15,14 @@ type TButtonSize = 'small' | 'medium' | 'large';
 
 interface IButtonProps {
   children: ReactNode;
+  onClick?: () => void;
   style?: object;
   color?: TButtonColor;
   size?: TButtonSize;
-  onClick?: () => void;
+  type?: 'submit' | 'button';
+  disabled?: boolean;
+  variant?: 'contained' | 'outlined' | 'text';
+  className?: string;
 }
 
 const MyButton: FC<IButtonProps> = ({
@@ -27,14 +31,21 @@ const MyButton: FC<IButtonProps> = ({
   onClick,
   color,
   size,
+  disabled,
+  className,
+  variant = 'contained',
+  type = 'button',
 }) => {
   return (
     <Button
+      type={type}
       style={style}
       color={color}
       size={size}
+      disabled={disabled}
       onClick={onClick}
-      variant="contained"
+      variant={variant}
+      className={className}
     >
       {children}
     </Button>
