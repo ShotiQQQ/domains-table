@@ -9,14 +9,22 @@ import {
   SelectChangeEvent,
 } from '@mui/material';
 
-const { AvailableDesc, AvailableAsc, Natural } = LocalDevsOrderBy;
+export interface ISortingItem {
+  orderBy: LocalDevsOrderBy;
+  text: string;
+}
 
 interface ISortingProps {
   value: LocalDevsOrderBy;
   onChange: (event: SelectChangeEvent) => void;
+  options: ISortingItem[];
 }
 
-const DomainsListSorting: FC<ISortingProps> = ({ value, onChange }) => {
+const DomainsListSorting: FC<ISortingProps> = ({
+  value,
+  onChange,
+  options,
+}) => {
   return (
     <FormControl size="small" style={{ width: '30%' }}>
       <InputLabel id="select-label">Сортировать</InputLabel>
@@ -29,11 +37,11 @@ const DomainsListSorting: FC<ISortingProps> = ({ value, onChange }) => {
         value={value}
         onChange={onChange}
       >
-        <MenuItem value={Natural}>По умолчанию</MenuItem>
-        <MenuItem value={AvailableDesc}>По статусу - сначала доступен</MenuItem>
-        <MenuItem value={AvailableAsc}>
-          По статусу - сначала недоступен
-        </MenuItem>
+        {options.map(({ orderBy, text }) => (
+          <MenuItem value={orderBy} key={orderBy}>
+            {text}
+          </MenuItem>
+        ))}
       </Select>
     </FormControl>
   );

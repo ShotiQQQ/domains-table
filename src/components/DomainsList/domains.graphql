@@ -1,15 +1,15 @@
-query GetDomains($after: Cursor, $first: Int, $includes: String, $orderBy: [LocalDevsOrderBy!]) {
+query GetDomains($first: Int, $includes: String, $orderBy: [LocalDevsOrderBy!], $offset: Int) {
     allLocalDevs(
-        after: $after
         first: $first
         filter: {domain: {includes: $includes}}
         orderBy: $orderBy
+        offset: $offset
     ) {
         nodes {
             ...DomainsListView
         }
         pageInfo {
-            ...PageInfo
+            hasNextPage
         }
     }
 }
@@ -20,13 +20,6 @@ fragment DomainsListView on LocalDev {
     id
     domain
     available
-}
-
-fragment PageInfo on PageInfo {
-    __typename
-
-    hasNextPage
-    endCursor
 }
 
 mutation CreateNewDomain($localDev: LocalDevInput!) {

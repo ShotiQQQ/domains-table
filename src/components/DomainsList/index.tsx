@@ -27,6 +27,8 @@ import { scrollElementToTop } from '../../utils/scrollElementToTop';
 import DomainsListSorting from './DomainsListSorting';
 import { LocalDevsOrderBy } from '../../types';
 
+import { sortingOptions } from '../../models/sortingOptions';
+
 const domainsPerPage = 50;
 const modalTitle = 'Добавить новый домен';
 
@@ -38,15 +40,14 @@ const DomainsList = () => {
   const [sortValue, setSortValue] = useState<LocalDevsOrderBy>(
     LocalDevsOrderBy.Natural,
   );
-  const [endCursor, setEndCursor] = useState<string | null>(null);
   const [hasNextPage, setHasNextPage] = useState<boolean | undefined>(false);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [isFirstRender, setIsFirstRender] = useState(true);
 
-  const endCursorRef = useRef(endCursor);
   const hasNextPageRef = useRef(hasNextPage);
   const searchValueRef = useRef(searchValue);
   const sortValueRef = useRef(sortValue);
+  const domainsListRef = useRef(domainsList);
   const observedBlockRef = useRef(null);
   const tableContainerRef = useRef<HTMLDivElement>(null);
 
@@ -64,10 +65,11 @@ const DomainsList = () => {
   const handleSorting = (event: SelectChangeEvent) => {
     setSortValue(event.target.value as LocalDevsOrderBy);
   };
+
   const getDomainsList = (type: 'search' | 'default' = 'default') => {
     getDomains({
       variables: {
-        after: type === 'default' ? endCursorRef.current : null,
+        offset: type === 'search' ? 0 : domainsListRef.current.length,
         first: domainsPerPage,
         includes: searchValueRef.current,
         orderBy: sortValueRef.current,
@@ -91,7 +93,6 @@ const DomainsList = () => {
       }
 
       if (pageInfo) {
-        setEndCursor(pageInfo?.endCursor);
         setHasNextPage(pageInfo?.hasNextPage);
       }
     });
@@ -106,12 +107,12 @@ const DomainsList = () => {
   };
 
   useEffect(() => {
-    loadingRef.current = loading;
-  }, [loading]);
+    domainsListRef.current = domainsList;
+  }, [domainsList]);
 
   useEffect(() => {
-    endCursorRef.current = endCursor;
-  }, [endCursor]);
+    loadingRef.current = loading;
+  }, [loading]);
 
   useEffect(() => {
     hasNextPageRef.current = hasNextPage;
@@ -200,7 +201,11 @@ const DomainsList = () => {
               onChange={handleSearch}
             />
 
-            <DomainsListSorting value={sortValue} onChange={handleSorting} />
+            <DomainsListSorting
+              value={sortValue}
+              onChange={handleSorting}
+              options={sortingOptions}
+            />
           </div>
         </div>
 

@@ -2,7 +2,7 @@ import { FC, ReactNode } from 'react';
 
 import styles from './Modal.module.scss';
 
-import { Alert, Dialog, DialogTitle } from '@mui/material';
+import { Dialog, DialogTitle } from '@mui/material';
 
 interface IModalProps {
   title: string;
