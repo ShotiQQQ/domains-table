@@ -1,0 +1,8 @@
+.status {
+  --status-size: 30px;
+
+  display: block;
+  width: var(--status-size);
+  height: var(--status-size);
+  border-radius: 100%;
+}

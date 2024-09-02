@@ -1,6 +1,6 @@
 import { FC, ReactNode } from 'react';
 
-import { Button } from '@mui/material';
+import { Button, type SxProps } from '@mui/material';
 
 type TButtonColor =
   | 'inherit'
@@ -23,6 +23,7 @@ interface IButtonProps {
   disabled?: boolean;
   variant?: 'contained' | 'outlined' | 'text';
   className?: string;
+  sx?: SxProps;
 }
 
 const MyButton: FC<IButtonProps> = ({
@@ -35,6 +36,7 @@ const MyButton: FC<IButtonProps> = ({
   className,
   variant = 'contained',
   type = 'button',
+  sx,
 }) => {
   return (
     <Button
@@ -46,6 +48,7 @@ const MyButton: FC<IButtonProps> = ({
       onClick={onClick}
       variant={variant}
       className={className}
+      sx={sx}
     >
       {children}
     </Button>

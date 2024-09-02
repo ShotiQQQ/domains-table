@@ -3,8 +3,6 @@ import { ChangeEvent, FC, useState } from 'react';
 import MyInput from '../../UI/MyInput';
 import MyButton from '../../UI/MyButton';
 import Form from '../../UI/Form';
-import { Alert, Fade, Slide } from '@mui/material';
-import { Check } from '@mui/icons-material';
 
 import { getUniqueID } from '../../../utils/getUniqueID';
 import { checkHasHTTP } from '../../../utils/checkHasHTTP';
@@ -69,17 +67,6 @@ const DomainsListAddNewItem: FC<INewItemProps> = ({ closeModal }) => {
         >
           Добавить
         </MyButton>
-
-        <Slide
-          in={isShownDone}
-          style={{ position: 'absolute', inset: '-24px 0 auto' }}
-        >
-          <Fade in={isShownDone}>
-            <Alert icon={<Check fontSize="inherit" />} severity="success">
-              Домен успешно добавлен
-            </Alert>
-          </Fade>
-        </Slide>
       </div>
     </Form>
   );

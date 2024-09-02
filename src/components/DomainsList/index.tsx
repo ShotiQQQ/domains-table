@@ -11,6 +11,7 @@ import {
   CircularProgress,
   IconButton,
   Paper,
+  SelectChangeEvent,
   Table,
   TableBody,
   TableContainer,
@@ -23,6 +24,8 @@ import {
 } from './domains.generated';
 import DomainsListAddNewItem from './DomainsListAddNewItem';
 import { scrollElementToTop } from '../../utils/scrollElementToTop';
+import DomainsListSorting from './DomainsListSorting';
+import { LocalDevsOrderBy } from '../../types';
 
 const domainsPerPage = 50;
 const modalTitle = 'Добавить новый домен';
@@ -32,6 +35,9 @@ const DomainsList = () => {
     (DomainsListViewFragment | null)[]
   >([]);
   const [searchValue, setSearchValue] = useState('');
+  const [sortValue, setSortValue] = useState<LocalDevsOrderBy>(
+    LocalDevsOrderBy.Natural,
+  );
   const [endCursor, setEndCursor] = useState<string | null>(null);
   const [hasNextPage, setHasNextPage] = useState<boolean | undefined>(false);
   const [isOpenModal, setIsOpenModal] = useState(false);
@@ -40,6 +46,7 @@ const DomainsList = () => {
   const endCursorRef = useRef(endCursor);
   const hasNextPageRef = useRef(hasNextPage);
   const searchValueRef = useRef(searchValue);
+  const sortValueRef = useRef(sortValue);
   const observedBlockRef = useRef(null);
   const tableContainerRef = useRef<HTMLDivElement>(null);
 
@@ -54,12 +61,16 @@ const DomainsList = () => {
     setIsOpenModal(false);
   };
 
+  const handleSorting = (event: SelectChangeEvent) => {
+    setSortValue(event.target.value as LocalDevsOrderBy);
+  };
   const getDomainsList = (type: 'search' | 'default' = 'default') => {
     getDomains({
       variables: {
         after: type === 'default' ? endCursorRef.current : null,
         first: domainsPerPage,
         includes: searchValueRef.current,
+        orderBy: sortValueRef.current,
       },
     }).then(({ data }) => {
       const list = data?.allLocalDevs?.nodes;
@@ -90,6 +101,10 @@ const DomainsList = () => {
     setSearchValue(event.target.value);
   };
 
+  const handleClickRemoveSearch = () => {
+    setSearchValue('');
+  };
+
   useEffect(() => {
     loadingRef.current = loading;
   }, [loading]);
@@ -105,6 +120,10 @@ const DomainsList = () => {
   useEffect(() => {
     searchValueRef.current = searchValue;
   }, [searchValue]);
+
+  useEffect(() => {
+    sortValueRef.current = sortValue;
+  }, [sortValue]);
 
   useEffect(() => {
     getDomainsList();
@@ -127,6 +146,12 @@ const DomainsList = () => {
       }
     };
   }, [searchValue]);
+
+  useEffect(() => {
+    if (!isFirstRender) {
+      getDomainsList('search');
+    }
+  }, [sortValue]);
 
   useEffect(() => {
     if (!loading) {
@@ -161,13 +186,29 @@ const DomainsList = () => {
             </IconButton>
           </div>
 
-          <DomainsListSearch value={searchValue} onChange={handleSearch} />
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              gap: '12px',
+            }}
+          >
+            <DomainsListSearch
+              isVisibleRemove={!!searchValue.length}
+              value={searchValue}
+              handleClickRemoveSearch={handleClickRemoveSearch}
+              onChange={handleSearch}
+            />
+
+            <DomainsListSorting value={sortValue} onChange={handleSorting} />
+          </div>
         </div>
 
         <div className={styles.listContent}>
           <Paper sx={{ overflow: 'hidden' }}>
             <TableContainer
               sx={{ maxHeight: 440, overscrollBehavior: 'none' }}
+              className={styles.listTableContainer}
               ref={tableContainerRef}
             >
               <div className={styles.listWrapper}>

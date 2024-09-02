@@ -21,7 +21,7 @@ const DomainsListItem: FC<LocalDev> = ({ id, domain, available }) => {
           {domain}
         </Link>
       </TableCell>
-      <TableCell>
+      <TableCell align="center" width="100">
         <DomainsListStatus isAvailable={available} />
       </TableCell>
       <TableCell align="right">

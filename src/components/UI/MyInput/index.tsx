@@ -1,6 +1,6 @@
-import { ChangeEvent, FC } from 'react';
+import { ChangeEvent, FC, ReactNode } from 'react';
 
-import { SxProps, TextField } from '@mui/material';
+import { OutlinedInput, SxProps } from '@mui/material';
 
 interface IInputProps {
   value: string;
@@ -8,6 +8,7 @@ interface IInputProps {
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
   sx?: SxProps;
   required?: boolean;
+  endAdornment?: ReactNode;
 }
 
 const MyInput: FC<IInputProps> = ({
@@ -16,16 +17,17 @@ const MyInput: FC<IInputProps> = ({
   placeholder,
   sx,
   required,
+  endAdornment,
 }) => {
   return (
-    <TextField
+    <OutlinedInput
       required={required}
-      variant="outlined"
       size="small"
       onChange={onChange}
       value={value}
-      label={placeholder}
+      placeholder={placeholder}
       sx={sx}
+      endAdornment={endAdornment}
     />
   );
 };

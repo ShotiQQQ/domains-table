@@ -1,8 +1,9 @@
-query GetDomains($after: Cursor, $first: Int, $includes: String) {
+query GetDomains($after: Cursor, $first: Int, $includes: String, $orderBy: [LocalDevsOrderBy!]) {
     allLocalDevs(
         after: $after
         first: $first
         filter: {domain: {includes: $includes}}
+        orderBy: $orderBy
     ) {
         nodes {
             ...DomainsListView
@@ -10,7 +11,6 @@ query GetDomains($after: Cursor, $first: Int, $includes: String) {
         pageInfo {
             ...PageInfo
         }
-        totalCount
     }
 }
 

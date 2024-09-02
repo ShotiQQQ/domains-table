@@ -13,7 +13,7 @@ const DomainsListStatus: FC<IStatusProps> = ({ isAvailable }) => {
       color={isAvailable ? 'success' : 'error'}
       variant="outlined"
       size="small"
-      sx={{ borderRadius: '4px' }}
+      sx={{ borderRadius: '4px', textTransform: 'lowercase', width: '100%' }}
     />
   );
 };
